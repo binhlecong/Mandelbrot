@@ -1,9 +1,10 @@
 #include "SDL.h"
+#include "windows.h"
 
 #define HEIGHT 1000
 #define WIDTH  1000
 
-int maxIteration = 200;
+int maxIteration = 400;
 long double min = -2.0;
 long double max = 2.0;
 
@@ -21,12 +22,20 @@ int main(int argc, char* argv[])
 	SDL_Event event;
 
 	//Uint32 flag = SDL_WINDOW_FULLSCREEN;
-	window = SDL_CreateWindow("BINH", 200, 40, 1600, 1000, 0);
+	window = SDL_CreateWindow("BINH", 200, 40, 1000, 1000, 0);
 	renderer = SDL_CreateRenderer(window, -1, 0);
 	SDL_RenderSetLogicalSize(renderer, WIDTH, HEIGHT);
 
+	// frame time
+	const int FPS = 1;
+	const int framedelay = 1000 / FPS;
+	Uint32 frameStart = 0;
+	int frameTime = 0;
+
 	while (true)
 	{
+		frameStart = SDL_GetTicks();
+
 		SDL_RenderPresent(renderer);
 
 		for (size_t i = 0; i < WIDTH; i++)
@@ -73,9 +82,15 @@ int main(int argc, char* argv[])
 		}
 
 		
-		if (SDL_PollEvent(&event) && event.type == SDL_QUIT)
-		{
+		if (SDL_PollEvent(&event) && event.type == SDL_QUIT) 
 			break;
+
+		maxIteration = max(10, maxIteration - 10);
+
+		frameTime = SDL_GetTicks() - frameStart;
+		if (framedelay > frameTime)
+		{
+			SDL_Delay(framedelay - frameTime);
 		}
 	}
 
