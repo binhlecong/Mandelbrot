@@ -4,7 +4,7 @@
 #define HEIGHT 1000
 #define WIDTH  1000
 
-int maxIteration = 400;
+int maxIteration = 100;
 long double min = -2.0;
 long double max = 2.0;
 
@@ -28,9 +28,16 @@ int main(int argc, char* argv[])
 
 	// frame time
 	const int FPS = 1;
-	const int framedelay = 1000 / FPS;
+	const int framedelay = 3000 / FPS;
 	Uint32 frameStart = 0;
 	int frameTime = 0;
+
+	//// color conversion
+	//float H;
+	//float S = 0.75, V = 0.75;
+	//float C = V * S;
+	//float m = V - C;
+
 
 	while (true)
 	{
@@ -65,16 +72,46 @@ int main(int argc, char* argv[])
 					n++;
 				}
 
-				int brightness = map(n, 0, maxIteration, 0, 255);
+				int brightness = map(n, 0, maxIteration, 30, 330);
 
 				if (n == maxIteration)
 				{
 					brightness = 0;
 				}
 
-				int red = brightness;
+				int red, green, blue;
+				if (0 < brightness && brightness < 120)
+				{
+					red = 255 - map(brightness, 0, 120, 0, 255);
+					green = map(brightness, 0, 120, 0, 255);
+					blue = 0;
+				}
+				else if (120 <= brightness && brightness < 240)
+				{
+					red = 0;
+					green = 255 - map(brightness, 120, 240, 0, 255);
+					blue = map(brightness, 120, 240, 0, 255);
+				}
+				else if (240 <= brightness && brightness < 360)
+				{
+					red = map(brightness, 240, 360, 0, 255);
+					green = 0;
+					blue = 255 - map(brightness, 240, 360, 0, 255);
+				}
+				else
+				{
+					red = 0;
+					green = 0;
+					blue = 0;
+				}
+
+				/*int red = brightness;
 				int green = map(brightness * brightness, 0, 255 * 255, 0, 255);
-				int blue = map(sqrt(brightness), 0, sqrt(255), 0, 255);
+				int blue = map(sqrt(brightness), 0, sqrt(255), 0, 255);*/
+
+				/*int red   = 255 * (_R + m);
+				int green = 255 * (_G + m);
+				int blue  = 255 * (_B + m);*/
 
 				SDL_SetRenderDrawColor(renderer, red, green, blue, 255);
 				SDL_RenderDrawPoint(renderer, i, j);
@@ -85,13 +122,11 @@ int main(int argc, char* argv[])
 		if (SDL_PollEvent(&event) && event.type == SDL_QUIT) 
 			break;
 
-		maxIteration = max(10, maxIteration - 10);
+		//maxIteration = max(10, maxIteration - 10);
 
-		frameTime = SDL_GetTicks() - frameStart;
+		/*frameTime = SDL_GetTicks() - frameStart;
 		if (framedelay > frameTime)
-		{
-			SDL_Delay(framedelay - frameTime);
-		}
+			SDL_Delay(framedelay - frameTime);*/
 	}
 
 	SDL_DestroyWindow(window);
